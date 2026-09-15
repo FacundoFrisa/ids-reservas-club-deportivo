@@ -5,7 +5,7 @@ Backend desarrollado en Python y Flask para la gestión de canchas, socios, disp
 ## Integrantes
 * **Nombre y Apellido** - Padrón / DNI
 * **Nombre y Apellido** - Padrón / DNI
-* **Nombre y Apellido** - Padrón / DNI
+* **Facundo Frisa** - 116621 / 47205331
 * **Nombre y Apellido** - Padrón / DNI
 * **Nombre y Apellido** - Padrón / DNI
 * **Nombre y Apellido** - Padrón / DNI
