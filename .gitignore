@@ -1,0 +1,12 @@
+# Entorno vitual de Python
+venv/
+.venv/
+__pycache__/
+*.pyc
+
+# Configuración sensible y entorno
+.env
+
+# Archivos de IDEs
+.vscode/
+.idea/
