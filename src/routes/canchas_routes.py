@@ -4,9 +4,17 @@ from src.utils.pagination import get_pagination_params, generate_hateoas_links
 
 canchas_bp = Blueprint("canchas", __name__)
 
+PARAMETROS_PERMITIDOS = {'id_deporte', 'nombre', 'techada', 'activa', '_limit', '_offset'}
+
 @canchas_bp.route("/canchas", methods=["GET"])
 def get_canchas():
     try:
+        parametros_recibidos = set(request.args.keys())
+        desconocidos = parametros_recibidos - PARAMETROS_PERMITIDOS
+        
+        if desconocidos:
+            raise ValueError(f"Parámetro(s) no permitido(s): {', '.join(desconocidos)}")
+
         limit, offset = get_pagination_params()
         if not (1 <= limit <= 100) or offset < 0:
             raise ValueError("El límite debe estar entre 1 y 100, y el offset debe ser mayor o igual a 0.")
@@ -38,7 +46,6 @@ def get_canchas():
         }), 200
 
     except ValueError as ve:
-
         return jsonify({
             "errors": [{
                 "code": "BAD_REQUEST",
@@ -48,7 +55,6 @@ def get_canchas():
             }]
         }), 400
     except Exception as e:
-
         return jsonify({
             "errors": [{
                 "code": "INTERNAL_SERVER_ERROR",
