@@ -47,3 +47,23 @@ class CanchasRepository:
 
         finally:
             conexion.close()
+
+    @staticmethod
+    def crear_cancha(data):
+        conexion = get_db_connection()
+        try:
+            with conexion.cursor() as cursor:
+                query = """
+                    INSERT INTO canchas (nombre, id_deporte, precio_hora, techada, activa)
+                    VALUES (%s, %s, %s, %s, %s)
+                """
+                cursor.execute(query, (
+                    data['nombre'], 
+                    data['id_deporte'], 
+                    data['precio_hora'], 
+                    data['techada'], 
+                    data['activa']
+                ))
+                conexion.commit()
+        finally:
+            conexion.close()
