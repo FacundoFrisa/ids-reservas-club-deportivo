@@ -82,3 +82,43 @@ def validar_creacion_cancha(data):
         data['activa'] = True
 
     return data
+
+def validar_actualizacion_cancha(data):
+    if not isinstance(data, dict) or not data:
+        raise ValueError("El cuerpo de la solicitud en actualizaciones no puede estar vacío.")
+    
+    permitidos = {'nombre', 'precio_hora', 'techada', 'activa'}
+    desconocidos = set(data.keys()) - permitidos
+    if desconocidos:
+        raise ValueError(f"Campos no permitidos o inmutables en la actualización: {', '.join(desconocidos)}")
+
+    if 'nombre' in data:
+        if type(data['nombre']) is not str:
+            raise ValueError("El nombre debe ser una cadena de texto.")
+        nombre_limpio = data['nombre'].strip()
+        if not nombre_limpio:
+            raise ValueError("El nombre no podrá quedar vacío después de quitar espacios.")
+        data['nombre'] = nombre_limpio
+
+    if 'precio_hora' in data:
+        if type(data['precio_hora']) is not int or data['precio_hora'] <= 0:
+            raise ValueError("The precio_hora debe ser un entero positivo en centavos.")
+
+    if 'techada' in data:
+        if type(data['techada']) is not bool:
+            raise ValueError("El campo 'techada' admite únicamente true o false.")
+
+    if 'activa' in data:
+        if type(data['activa']) is not bool:
+            raise ValueError("El campo 'activa' admite únicamente true o false.")
+
+    return data
+
+def validar_id_cancha(id_cancha):
+    try:
+        id_int = int(id_cancha)
+        if id_int <= 0:
+            raise ValueError("El ID de la cancha debe ser un entero positivo.")
+        return id_int
+    except ValueError:
+        raise ValueError("El ID de la cancha debe ser un entero positivo.")
