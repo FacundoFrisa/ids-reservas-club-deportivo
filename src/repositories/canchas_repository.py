@@ -67,3 +67,39 @@ class CanchasRepository:
                 conexion.commit()
         finally:
             conexion.close()
+            
+    @staticmethod
+    def obtener_cancha_por_id(id_cancha):
+        conexion = get_db_connection()
+        try:
+            with conexion.cursor() as cursor:
+                cursor.execute("""
+                    SELECT id, nombre, id_deporte, precio_hora, techada, activa 
+                    FROM canchas 
+                    WHERE id = %s
+                """, (id_cancha,))
+                return cursor.fetchone()
+        finally:
+            conexion.close()
+
+    @staticmethod
+    def actualizar_cancha(id_cancha, data):
+        if not data:
+            return
+
+        conexion = get_db_connection()
+        try:
+            with conexion.cursor() as cursor:
+                campos_set = []
+                valores = []
+                for clave, valor in data.items():
+                    campos_set.append(f"{clave} = %s")
+                    valores.append(valor)
+                
+                valores.append(id_cancha)
+                query = f"UPDATE canchas SET {', '.join(campos_set)} WHERE id = %s"
+                
+                cursor.execute(query, tuple(valores))
+                conexion.commit()
+        finally:
+            conexion.close()

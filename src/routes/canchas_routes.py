@@ -1,8 +1,9 @@
 from flask import Blueprint, jsonify, request
 
-from src.services.canchas_service import obtener_canchas, crear_cancha
-from src.validators.canchas_validator import validar_y_obtener_filtros_canchas, validar_creacion_cancha
+from src.services.canchas_service import obtener_canchas, crear_cancha, obtener_cancha_por_id, actualizar_cancha
+from src.validators.canchas_validator import validar_y_obtener_filtros_canchas, validar_creacion_cancha, validar_actualizacion_cancha
 from src.utils.pagination import get_pagination_params, generate_hateoas_links
+from src.errors.exceptions import BadRequestError
 
 canchas_bp = Blueprint("canchas", __name__)
 
@@ -39,3 +40,19 @@ def post_cancha():
     crear_cancha(datos_limpios)
 
     return "", 201
+
+@canchas_bp.route("/canchas/<int:id>", methods=["GET"])
+def get_cancha_id(id):
+    cancha = obtener_cancha_por_id(id)
+    return jsonify(cancha), 200
+
+@canchas_bp.route("/canchas/<int:id>", methods=["PATCH"])
+def patch_cancha(id):
+    data = request.get_json(silent=True)
+    if not data:
+        raise BadRequestError("El cuerpo de la solicitud en actualizaciones no puede estar vacío.")
+        
+    datos_limpios = validar_actualizacion_cancha(data)
+    actualizar_cancha(id, datos_limpios)
+    
+    return "", 204
