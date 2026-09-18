@@ -113,3 +113,12 @@ def validar_actualizacion_cancha(data):
             raise ValueError("El campo 'activa' admite únicamente true o false.")
 
     return data
+
+def validar_id_cancha(id_cancha):
+    try:
+        id_int = int(id_cancha)
+        if id_int <= 0:
+            raise ValueError("El ID de la cancha debe ser un entero positivo.")
+        return id_int
+    except ValueError:
+        raise ValueError("El ID de la cancha debe ser un entero positivo.")
