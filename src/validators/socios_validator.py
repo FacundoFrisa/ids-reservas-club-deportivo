@@ -8,6 +8,7 @@ PARAMETROS_PERMITIDOS = {
 }
 
 CAMPOS_PERMITIDOS_POST = {"nombre", "email"}
+CAMPOS_PERMITIDOS_PATCH = {"nombre", "email", "activo"}
 REGEX_EMAIL = r"^[\w\.-]+@[\w\.-]+\.\w+$"
 
 def validar_y_obtener_filtros_socios(args):
@@ -89,3 +90,53 @@ def validar_creacion_socio(data):
         "nombre": nombre.strip(),
         "email": email_limpio,
     }
+
+def validar_actualizacion_socio(data):
+    if not data or not isinstance(data, dict) or len(data) == 0:
+        raise ValueError("El cuerpo de la solicitud no puede estar vacío.")
+
+    desconocidos = set(data.keys()) - CAMPOS_PERMITIDOS_PATCH
+
+    if desconocidos:
+        raise ValueError(
+            f"Se rechazan campos no permitidos: {', '.join(desconocidos)}"
+        )
+
+    datos_validados = {}
+
+    if "nombre" in data:
+        nombre = data["nombre"]
+
+        if not isinstance(nombre, str) or not nombre.strip():
+            raise ValueError("El campo 'nombre' no puede quedar vacío.")
+
+        datos_validados["nombre"] = nombre.strip()
+
+    if "email" in data:
+        email = data["email"]
+
+        if not isinstance(email, str):
+            raise ValueError(
+                "El campo 'email' debe ser una cadena de texto."
+            )
+
+        email_limpio = email.strip().lower()
+
+        if not re.match(REGEX_EMAIL, email_limpio):
+            raise ValueError(
+                f"El correo electrónico '{email}' no tiene un formato válido."
+            )
+
+        datos_validados["email"] = email_limpio
+
+    if "activo" in data:
+        activo = data["activo"]
+
+        if not isinstance(activo, bool):
+            raise ValueError(
+                "El campo 'activo' debe ser un valor booleano (true o false)."
+            )
+
+        datos_validados["activo"] = activo
+
+    return datos_validados

@@ -4,6 +4,7 @@ from src.services.socios_service import (
     obtener_socios,
     obtener_socio_por_id,
     crear_socio,
+    actualizar_socio,
 )
 
 from src.utils.pagination import (
@@ -15,6 +16,7 @@ from src.validators.socios_validator import (
     validar_id_socio,
     validar_y_obtener_filtros_socios,
     validar_creacion_socio,
+    validar_actualizacion_socio,
 )
 
 
@@ -65,3 +67,18 @@ def post_socio():
     nuevo_socio = crear_socio(datos_validados)
 
     return jsonify(nuevo_socio), 201
+
+@socios_bp.route("/socios/<int(signed=True):id>", methods=["PATCH"])
+def patch_socio(id):
+    validar_id_socio(id)
+
+    data = request.get_json(silent=True)
+
+    datos_validados = validar_actualizacion_socio(data)
+
+    socio_actualizado = actualizar_socio(
+        id,
+        datos_validados,
+    )
+
+    return jsonify(socio_actualizado), 200
