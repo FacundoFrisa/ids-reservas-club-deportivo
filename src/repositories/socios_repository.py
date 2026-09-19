@@ -120,3 +120,78 @@ class SociosRepository:
 
         finally:
             conexion.close()
+
+    @staticmethod
+    def existe_email_otro_socio(email, id_socio):
+        conexion = get_db_connection()
+
+        try:
+            with conexion.cursor() as cursor:
+                query = """
+                    SELECT 1
+                    FROM socios
+                    WHERE LOWER(email) = LOWER(%s)
+                    AND id != %s
+                """
+                cursor.execute(query, (email, id_socio))
+
+                return cursor.fetchone() is not None
+
+        finally:
+            conexion.close()
+
+    @staticmethod
+    def actualizar_socio(id_socio, datos):
+        conexion = get_db_connection()
+
+        try:
+            with conexion.cursor() as cursor:
+                campos_sql = []
+                valores = []
+
+                if "nombre" in datos:
+                    campos_sql.append("nombre = %s")
+                    valores.append(datos["nombre"])
+
+                if "email" in datos:
+                    campos_sql.append("email = %s")
+                    valores.append(datos["email"])
+
+                if "activo" in datos:
+                    campos_sql.append("activo = %s")
+                    valores.append(datos["activo"])
+
+                valores.append(id_socio)
+
+                set_sql = ", ".join(campos_sql)
+
+                query = f"""
+                    UPDATE socios
+                    SET {set_sql}
+                    WHERE id = %s
+                """
+
+                cursor.execute(query, tuple(valores))
+
+                conexion.commit()
+
+                cursor.execute(
+                    """
+                    SELECT id, nombre, email, activo
+                    FROM socios
+                    WHERE id = %s
+                    """,
+                    (id_socio,),
+                )
+
+                socio_actualizado = cursor.fetchone()
+
+                if socio_actualizado:
+                    socio_actualizado["activo"] = bool(
+                        socio_actualizado["activo"]
+                    )
+
+                return socio_actualizado
+
+        finally:
+            conexion.close()
