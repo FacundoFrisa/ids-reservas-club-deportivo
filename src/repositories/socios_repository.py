@@ -1,6 +1,5 @@
 from src.database.connection import get_db_connection
 
-
 class SociosRepository:
 
     @staticmethod
@@ -78,6 +77,46 @@ class SociosRepository:
                     socio["activo"] = bool(socio["activo"])
 
                 return socio
+
+        finally:
+            conexion.close()
+
+    @staticmethod
+    def existe_email(email):
+        conexion = get_db_connection()
+
+        try:
+            with conexion.cursor() as cursor:
+                query = "SELECT 1 FROM socios WHERE LOWER(email) = LOWER(%s)"
+                cursor.execute(query, (email,))
+
+                return cursor.fetchone() is not None
+
+        finally:
+            conexion.close()
+
+    @staticmethod
+    def crear_socio(nombre, email):
+        conexion = get_db_connection()
+
+        try:
+            with conexion.cursor() as cursor:
+                query = """
+                    INSERT INTO socios (nombre, email, activo)
+                    VALUES (%s, %s, 1)
+                """
+                cursor.execute(query, (nombre, email))
+
+                id_nuevo = cursor.lastrowid
+
+                conexion.commit()
+
+                return {
+                    "id": id_nuevo,
+                    "nombre": nombre,
+                    "email": email,
+                    "activo": True,
+                }
 
         finally:
             conexion.close()
