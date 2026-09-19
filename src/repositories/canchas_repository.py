@@ -103,3 +103,23 @@ class CanchasRepository:
                 conexion.commit()
         finally:
             conexion.close()
+            
+    @staticmethod
+    def tiene_reservas(id_cancha):
+        conexion = get_db_connection()
+        try:
+            with conexion.cursor() as cursor:
+                cursor.execute("SELECT 1 FROM reservas WHERE id_cancha = %s LIMIT 1", (id_cancha,))
+                return cursor.fetchone() is not None
+        finally:
+            conexion.close()
+
+    @staticmethod
+    def eliminar_cancha(id_cancha):
+        conexion = get_db_connection()
+        try:
+            with conexion.cursor() as cursor:
+                cursor.execute("DELETE FROM canchas WHERE id = %s", (id_cancha,))
+                conexion.commit()
+        finally:
+            conexion.close()

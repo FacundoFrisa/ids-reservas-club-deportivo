@@ -1,6 +1,6 @@
 from flask import Blueprint, jsonify, request
 
-from src.services.canchas_service import obtener_canchas, crear_cancha, obtener_cancha_por_id, actualizar_cancha
+from src.services.canchas_service import obtener_canchas, crear_cancha, obtener_cancha_por_id, actualizar_cancha, eliminar_cancha
 from src.validators.canchas_validator import validar_y_obtener_filtros_canchas, validar_creacion_cancha, validar_actualizacion_cancha, validar_id_cancha
 from src.utils.pagination import get_pagination_params, generate_hateoas_links
 from src.errors.exceptions import BadRequestError
@@ -57,5 +57,12 @@ def patch_cancha(id):
         
     datos_limpios = validar_actualizacion_cancha(data)
     actualizar_cancha(id_valido, datos_limpios)
+    
+    return "", 204
+
+@canchas_bp.route("/canchas/<id>", methods=["DELETE"])
+def delete_cancha(id):
+    id_valido = validar_id_cancha(id)
+    eliminar_cancha(id_valido)
     
     return "", 204
