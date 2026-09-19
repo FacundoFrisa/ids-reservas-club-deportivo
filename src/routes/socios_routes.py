@@ -3,6 +3,7 @@ from flask import Blueprint, jsonify, request
 from src.services.socios_service import (
     obtener_socios,
     obtener_socio_por_id,
+    crear_socio,
 )
 
 from src.utils.pagination import (
@@ -13,6 +14,7 @@ from src.utils.pagination import (
 from src.validators.socios_validator import (
     validar_id_socio,
     validar_y_obtener_filtros_socios,
+    validar_creacion_socio,
 )
 
 
@@ -53,3 +55,13 @@ def get_socio_by_id(id):
     validar_id_socio(id)
     socio = obtener_socio_por_id(id)
     return jsonify(socio), 200
+
+@socios_bp.route("/socios", methods=["POST"])
+def post_socio():
+    data = request.get_json(silent=True)
+
+    datos_validados = validar_creacion_socio(data)
+
+    nuevo_socio = crear_socio(datos_validados)
+
+    return jsonify(nuevo_socio), 201
