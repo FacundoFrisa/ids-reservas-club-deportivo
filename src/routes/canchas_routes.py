@@ -1,7 +1,7 @@
 from flask import Blueprint, jsonify, request
 
-from src.services.canchas_service import obtener_canchas, crear_cancha, obtener_cancha_por_id, actualizar_cancha, eliminar_cancha
-from src.validators.canchas_validator import validar_y_obtener_filtros_canchas, validar_creacion_cancha, validar_actualizacion_cancha, validar_id_cancha
+from src.services.canchas_service import obtener_canchas, crear_cancha, obtener_cancha_por_id, actualizar_cancha, eliminar_cancha, obtener_canchas_disponibles
+from src.validators.canchas_validator import validar_y_obtener_filtros_canchas, validar_creacion_cancha, validar_actualizacion_cancha, validar_id_cancha, validar_y_obtener_filtros_disponibles
 from src.utils.pagination import get_pagination_params, generate_hateoas_links
 from src.errors.exceptions import BadRequestError
 
@@ -40,6 +40,26 @@ def post_cancha():
     crear_cancha(datos_limpios)
 
     return "", 201
+
+@canchas_bp.route("/canchas/disponibles", methods=["GET"])
+def get_canchas_disponibles():
+    limit, offset = get_pagination_params()
+    filtros = validar_y_obtener_filtros_disponibles(request.args)
+    
+    canchas, total_records = obtener_canchas_disponibles(filtros, limit, offset)
+
+    links = generate_hateoas_links(
+        request.base_url,
+        limit,
+        offset,
+        total_records,
+        request.args
+    )
+
+    return jsonify({
+        "canchas": canchas if canchas else [],
+        "_links": links
+    }), 200
 
 @canchas_bp.route("/canchas/<id>", methods=["GET"])
 def get_cancha_id(id):
