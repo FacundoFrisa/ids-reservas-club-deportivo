@@ -1,3 +1,5 @@
+from src.validators.time_validator import validar_intervalo_reserva
+
 PARAMETROS_PERMITIDOS = {
     'id_deporte',
     'nombre',
@@ -122,3 +124,44 @@ def validar_id_cancha(id_cancha):
         return id_int
     except ValueError:
         raise ValueError("El ID de la cancha debe ser un entero positivo.")
+    
+PARAMETROS_PERMITIDOS_DISPONIBLES = {
+    'fecha', 'hora_inicio', 'hora_fin', 'id_deporte', 'techada', '_limit', '_offset'
+}
+
+def validar_y_obtener_filtros_disponibles(args):
+    desconocidos = set(args.keys()) - PARAMETROS_PERMITIDOS_DISPONIBLES
+    if desconocidos:
+        raise ValueError(f"Parámetro(s) no permitido(s): {', '.join(desconocidos)}")
+
+    for req in ['fecha', 'hora_inicio', 'hora_fin']:
+        if req not in args:
+            raise ValueError(f"El parámetro '{req}' es obligatorio.")
+
+    fecha = args.get('fecha')
+    hora_inicio = args.get('hora_inicio')
+    hora_fin = args.get('hora_fin')
+
+    inicio_iso = f"{fecha}T{hora_inicio}.000000-03:00"
+    fin_iso = f"{fecha}T{hora_fin}.000000-03:00"
+
+    validar_intervalo_reserva(inicio_iso, fin_iso)
+
+    filtros = {
+        'fecha_hora_inicio': inicio_iso,
+        'fecha_hora_fin': fin_iso
+    }
+
+    if 'id_deporte' in args:
+        try:
+            filtros['id_deporte'] = int(args.get('id_deporte'))
+        except ValueError:
+            raise ValueError("El parámetro 'id_deporte' debe ser un número entero.")
+
+    if 'techada' in args:
+        val = args.get('techada')
+        if val not in ['true', 'false']:
+            raise ValueError("El filtro 'techada' solo admite 'true' o 'false'.")
+        filtros['techada'] = val
+
+    return filtros

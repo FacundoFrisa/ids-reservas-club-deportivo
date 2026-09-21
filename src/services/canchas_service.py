@@ -47,3 +47,12 @@ def eliminar_cancha(id_cancha):
         raise ConflictError("No se puede eliminar la cancha porque tiene reservas asociadas.")
         
     CanchasRepository.eliminar_cancha(id_cancha)
+    
+def obtener_canchas_disponibles(filtros, limit, offset):
+    canchas, total_records = CanchasRepository.buscar_canchas_disponibles(filtros, limit, offset)
+
+    for cancha in canchas:
+        cancha["techada"] = bool(cancha["techada"])
+        cancha["activa"] = bool(cancha["activa"])
+
+    return canchas, total_records
