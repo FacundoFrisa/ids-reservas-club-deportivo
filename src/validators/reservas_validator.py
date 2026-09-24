@@ -1,5 +1,6 @@
 from datetime import datetime
-
+from src.errors.exceptions import BadRequestError
+from src.validators.time_validator import validar_intervalo_reserva
 
 PARAMETROS_PERMITIDOS = {
     'id_cancha',
@@ -115,3 +116,25 @@ def validar_id_reserva(id_reserva):
         raise ValueError(
             "El ID de la reserva debe ser un entero positivo."
         )
+
+def validar_creacion_reserva(data):
+    if not data:
+        raise BadRequestError("El cuerpo de la solicitud no puede estar vacío.")
+
+    requeridos = ['id_socio', 'id_cancha', 'fecha_hora_inicio', 'fecha_hora_fin']
+    for req in requeridos:
+        if req not in data:
+            raise BadRequestError(f"El campo '{req}' es obligatorio.")
+
+    if not isinstance(data['id_socio'], int) or data['id_socio'] <= 0:
+        raise BadRequestError("El 'id_socio' debe ser un entero positivo.")
+    
+    if not isinstance(data['id_cancha'], int) or data['id_cancha'] <= 0:
+        raise BadRequestError("El 'id_cancha' debe ser un entero positivo.")
+
+    try:
+        validar_intervalo_reserva(data['fecha_hora_inicio'], data['fecha_hora_fin'])
+    except ValueError as e:
+        raise BadRequestError(str(e))
+
+    return data
