@@ -101,3 +101,17 @@ def validar_y_obtener_filtros_reservas(args):
             )
 
     return filtros
+
+def validar_id_reserva(id_reserva):
+    try:
+        id_int = int(id_reserva)
+
+        if id_int <= 0:
+            raise ValueError
+
+        return id_int
+
+    except (ValueError, TypeError):
+        raise ValueError(
+            "El ID de la reserva debe ser un entero positivo."
+        )

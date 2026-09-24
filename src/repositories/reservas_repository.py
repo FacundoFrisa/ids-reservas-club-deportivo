@@ -78,3 +78,26 @@ class ReservasRepository:
 
         finally:
             conexion.close()
+            
+    @staticmethod
+    def obtener_reserva_por_id(id_reserva):
+        conexion = get_db_connection()
+
+        try:
+            with conexion.cursor() as cursor:
+                cursor.execute("""
+                    SELECT
+                        id,
+                        id_socio,
+                        id_cancha,
+                        fecha_hora_inicio,
+                        fecha_hora_fin,
+                        estado,
+                        precio_hora,
+                        precio_total
+                    FROM reservas
+                    WHERE id = %s
+                """, (id_reserva,))
+                return cursor.fetchone()
+        finally:
+            conexion.close()
