@@ -25,7 +25,7 @@ def crear_cancha(data):
     if not DeportesRepository.existe_deporte(data['id_deporte']):
         raise LookupError(f"El deporte asociado al id {data['id_deporte']} no existe.")
 
-    CanchasRepository.crear_cancha(data)
+    return CanchasRepository.crear_cancha(data)
     
 def obtener_cancha_por_id(id_cancha):
     cancha = CanchasRepository.obtener_cancha_por_id(id_cancha)
