@@ -101,3 +101,57 @@ class ReservasRepository:
                 return cursor.fetchone()
         finally:
             conexion.close()
+            
+    @staticmethod
+    def verificar_cancha_y_socio(id_cancha, id_socio):
+        conexion = get_db_connection()
+        try:
+            with conexion.cursor() as cursor:
+                # Obtenemos si están activos y el precio vigente de la cancha[cite: 2]
+                cursor.execute("SELECT activa, precio_hora FROM canchas WHERE id = %s", (id_cancha,))
+                cancha = cursor.fetchone()
+                
+                cursor.execute("SELECT activo FROM socios WHERE id = %s", (id_socio,))
+                socio = cursor.fetchone()
+                
+                return cancha, socio
+        finally:
+            conexion.close()
+
+    @staticmethod
+    def verificar_superposicion(id_cancha, id_socio, inicio, fin):
+        conexion = get_db_connection()
+        try:
+            with conexion.cursor() as cursor:
+                query = """
+                    SELECT id, id_cancha, id_socio
+                    FROM reservas
+                    WHERE estado = 'confirmada'
+                      AND (id_cancha = %s OR id_socio = %s)
+                      AND fecha_hora_inicio < %s
+                      AND fecha_hora_fin > %s
+                    LIMIT 1
+                """
+                cursor.execute(query, (id_cancha, id_socio, fin, inicio))
+                return cursor.fetchone()
+        finally:
+            conexion.close()
+
+    @staticmethod
+    def crear_reserva(datos):
+        conexion = get_db_connection()
+        try:
+            with conexion.cursor() as cursor:
+                query = """
+                    INSERT INTO reservas 
+                    (id_socio, id_cancha, fecha_hora_inicio, fecha_hora_fin, estado, precio_hora, precio_total)
+                    VALUES (%s, %s, %s, %s, %s, %s, %s)
+                """
+                cursor.execute(query, (
+                    datos['id_socio'], datos['id_cancha'], datos['fecha_hora_inicio'],
+                    datos['fecha_hora_fin'], datos['estado'], datos['precio_hora'], datos['precio_total']
+                ))
+                conexion.commit()
+                return cursor.lastrowid
+        finally:
+            conexion.close()
