@@ -65,6 +65,18 @@ class CanchasRepository:
                     data['activa']
                 ))
                 conexion.commit()
+
+                id_nuevo = cursor.lastrowid
+
+                return {
+                    "id": id_nuevo,
+                    "nombre": data["nombre"], 
+                    "id_deporte": data["id_deporte"], 
+                    "precio_hora": data["precio_hora"], 
+                    "techada": bool(data["techada"]), 
+                    "activa": bool(data["activa"]) 
+                }
+
         finally:
             conexion.close()
             

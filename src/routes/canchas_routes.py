@@ -37,9 +37,9 @@ def post_cancha():
         raise ValueError("El cuerpo de la solicitud debe ser un objeto JSON válido y no estar vacío.")
     
     datos_limpios = validar_creacion_cancha(data)
-    crear_cancha(datos_limpios)
+    nueva_cancha = crear_cancha(datos_limpios)
 
-    return "", 201
+    return jsonify(nueva_cancha), 201
 
 @canchas_bp.route("/canchas/disponibles", methods=["GET"])
 def get_canchas_disponibles():
