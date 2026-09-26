@@ -52,7 +52,7 @@ def get_socios():
     }), 200
 
 
-@socios_bp.route("/socios/<int(signed=True):id>", methods=["GET"])
+@socios_bp.route("/socios/<id>", methods=["GET"])
 def get_socio_by_id(id):
     validar_id_socio(id)
     socio = obtener_socio_por_id(id)
