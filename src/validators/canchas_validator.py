@@ -9,6 +9,13 @@ PARAMETROS_PERMITIDOS = {
     '_offset'
 }
 
+PARAMETROS_PERMITIDOS_DISPONIBLES = {
+    'fecha', 'hora_inicio', 'hora_fin', 'id_deporte', 'techada', '_limit', '_offset'
+}
+
+CANCHA_TECHADA_DEFAULT = False 
+CANCHA_ACTIVA_DEFAULT = True
+
 def validar_y_obtener_filtros_canchas(args):
     desconocidos = set(args.keys()) - PARAMETROS_PERMITIDOS
 
@@ -75,13 +82,13 @@ def validar_creacion_cancha(data):
         if type(data['techada']) is not bool:
             raise ValueError("El campo 'techada' admite únicamente true o false.")
     else:
-        data['techada'] = False
+        data['techada'] = CANCHA_TECHADA_DEFAULT
 
     if 'activa' in data:
         if type(data['activa']) is not bool:
             raise ValueError("El campo 'activa' admite únicamente true o false.")
     else:
-        data['activa'] = True
+        data['activa'] = CANCHA_ACTIVA_DEFAULT
 
     return data
 
@@ -125,9 +132,6 @@ def validar_id_cancha(id_cancha):
     except ValueError:
         raise ValueError("El ID de la cancha debe ser un entero positivo.")
     
-PARAMETROS_PERMITIDOS_DISPONIBLES = {
-    'fecha', 'hora_inicio', 'hora_fin', 'id_deporte', 'techada', '_limit', '_offset'
-}
 
 def validar_y_obtener_filtros_disponibles(args):
     desconocidos = set(args.keys()) - PARAMETROS_PERMITIDOS_DISPONIBLES
