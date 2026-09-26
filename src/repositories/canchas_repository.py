@@ -43,6 +43,10 @@ class CanchasRepository:
                 cursor.execute(query_data, tuple(params_data))
                 canchas = cursor.fetchall()
 
+                for cancha in canchas:
+                    cancha["techada"] = bool(cancha["techada"])
+                    cancha["activa"] = bool(cancha["activa"])
+
                 return canchas, total_records
 
         finally:
