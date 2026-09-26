@@ -34,21 +34,6 @@ def register_error_handlers(app):
 
         return jsonify(response), 400
 
-    @app.errorhandler(LookupError)
-    def handle_lookup_error(error):
-        response = {
-            "errors": [
-                {
-                    "code": "NOT_FOUND",
-                    "message": "Recurso no encontrado.",
-                    "level": "error",
-                    "description": str(error)
-                }
-            ]
-        }
-
-        return jsonify(response), 404
-
     @app.errorhandler(HTTPException)
     def handle_http_exception(error):
         code_map = {

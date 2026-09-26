@@ -1,6 +1,6 @@
 from src.repositories.socios_repository import SociosRepository
 from src.errors.exceptions import ConflictError
-
+from src.errors.exceptions import NotFoundError
 def obtener_socios(filtros, limit, offset):
     return SociosRepository.obtener_socios(
         filtros,
@@ -13,7 +13,7 @@ def obtener_socio_por_id(id_socio):
     socio = SociosRepository.obtener_socio_por_id(id_socio)
 
     if not socio:
-        raise LookupError(
+        raise NotFoundError(
             f"El socio con ID {id_socio} no existe."
         )
 
@@ -36,7 +36,7 @@ def actualizar_socio(id_socio, datos_actualizacion):
     socio_actual = SociosRepository.obtener_socio_por_id(id_socio)
 
     if not socio_actual:
-        raise LookupError(
+        raise NotFoundError(
             f"El socio con ID {id_socio} no existe."
         )
 
