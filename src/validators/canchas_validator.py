@@ -44,8 +44,8 @@ def validar_y_obtener_filtros_canchas(args):
     return filtros
 
 def validar_creacion_cancha(data):
-    if not isinstance(data, dict):
-        raise ValueError("El cuerpo de la solicitud debe ser un objeto JSON válido.")
+    if not data or not isinstance(data, dict):
+        raise ValueError("El cuerpo de la solicitud debe ser un objeto JSON no vacío.")
 
     permitidos = {'nombre', 'id_deporte', 'precio_hora', 'techada', 'activa'}
     desconocidos = set(data.keys()) - permitidos
