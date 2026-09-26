@@ -111,7 +111,7 @@ def validar_actualizacion_cancha(data):
 
     if 'precio_hora' in data:
         if type(data['precio_hora']) is not int or data['precio_hora'] <= 0:
-            raise ValueError("The precio_hora debe ser un entero positivo en centavos.")
+            raise ValueError("El precio_hora debe ser un entero positivo en centavos.")
 
     if 'techada' in data:
         if type(data['techada']) is not bool:

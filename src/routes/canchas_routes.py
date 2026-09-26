@@ -66,14 +66,9 @@ def get_cancha_id(id):
 @canchas_bp.route("/canchas/<id>", methods=["PATCH"])
 def patch_cancha(id):
     id_valido = validar_id_cancha(id)
-    
     data = request.get_json(silent=True)
-    if not data:
-        raise BadRequestError("El cuerpo de la solicitud en actualizaciones no puede estar vacío.")
-        
     datos_limpios = validar_actualizacion_cancha(data)
     actualizar_cancha(id_valido, datos_limpios)
-    
     return "", 204
 
 @canchas_bp.route("/canchas/<id>", methods=["DELETE"])
