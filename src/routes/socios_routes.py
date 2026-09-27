@@ -52,7 +52,7 @@ def get_socios():
     }), 200
 
 
-@socios_bp.route("/socios/<int(signed=True):id>", methods=["GET"])
+@socios_bp.route("/socios/<id>", methods=["GET"])
 def get_socio_by_id(id):
     validar_id_socio(id)
     socio = obtener_socio_por_id(id)
@@ -61,24 +61,14 @@ def get_socio_by_id(id):
 @socios_bp.route("/socios", methods=["POST"])
 def post_socio():
     data = request.get_json(silent=True)
-
     datos_validados = validar_creacion_socio(data)
-
     nuevo_socio = crear_socio(datos_validados)
-
     return jsonify(nuevo_socio), 201
 
-@socios_bp.route("/socios/<int(signed=True):id>", methods=["PATCH"])
+@socios_bp.route("/socios/<id>", methods=["PATCH"])
 def patch_socio(id):
     validar_id_socio(id)
-
     data = request.get_json(silent=True)
-
     datos_validados = validar_actualizacion_socio(data)
-
-    socio_actualizado = actualizar_socio(
-        id,
-        datos_validados,
-    )
-
+    socio_actualizado = actualizar_socio(id,datos_validados)
     return jsonify(socio_actualizado), 200

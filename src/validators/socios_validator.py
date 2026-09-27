@@ -45,11 +45,10 @@ def validar_y_obtener_filtros_socios(args):
 
 
 def validar_id_socio(id_socio):
-    if id_socio <= 0:
-        raise ValueError(
-            "El ID del socio debe ser un entero positivo."
-        )
-
+    if not str(id_socio).isdigit() or int(id_socio) <= 0:
+        raise ValueError("El ID del socio debe ser un entero positivo.")
+    return int(id_socio)
+    
 def validar_creacion_socio(data):
     if not data or not isinstance(data, dict):
         raise ValueError(
