@@ -1,41 +1,38 @@
 from flask import Blueprint, jsonify, make_response, request
 from src.services import bloqueos_service
+from src.utils.pagination import get_pagination_params, generate_hateoas_links
+from src.validators.bloqueos_validator import validar_y_obtener_filtros_bloqueos, validar_creacion_bloqueo, validar_id_bloqueo
 
 bloqueos_bp = Blueprint("bloqueos", __name__)
 
 @bloqueos_bp.route("/bloqueos", methods=["GET"])
 def get_bloqueos():
-
-    limit = int(request.args.get('_limit', 10))
-    offset = int(request.args.get('_offset', 0))
-    
-    filtros = {
-        "id_cancha": request.args.get('id_cancha'),
-        "fecha": request.args.get('fecha')
-    }
-
+    limit, offset = get_pagination_params()
+    filtros = validar_y_obtener_filtros_bloqueos(request.args)
     bloqueos, total = bloqueos_service.obtener_bloqueos(filtros, limit, offset)
+
+    links = generate_hateoas_links(
+        request.base_url,
+        limit,
+        offset,
+        total,
+        request.args
+    )
     
     return jsonify({
-        "total": total,
-        "limit": limit,
-        "offset": offset,
         "bloqueos": bloqueos,
-        "_links": {}
+        "_links": links
     }), 200
 
 @bloqueos_bp.route("/bloqueos", methods=["POST"])
 def post_bloqueo():
     data = request.get_json(silent=True)
-    if not data:
-        raise ValueError("El cuerpo de la solicitud no puede estar vacío.")
-
-    nuevo_bloqueo = bloqueos_service.crear_bloqueo(data)
+    datos_validados = validar_creacion_bloqueo(data)
+    nuevo_bloqueo = bloqueos_service.crear_bloqueo(datos_validados)
     return jsonify(nuevo_bloqueo), 201
 
-@bloqueos_bp.route("/bloqueos/<int:id>", methods=["DELETE"])
+@bloqueos_bp.route("/bloqueos/<id>", methods=["DELETE"])
 def delete_bloqueo(id):
-    bloqueos_service.eliminar_bloqueo(id)
-    response = make_response("", 204)
-    response.headers["Content-Type"] = "application/json"
-    return response
+    id_valido = validar_id_bloqueo(id)
+    bloqueos_service.eliminar_bloqueo(id_valido)
+    return "", 204

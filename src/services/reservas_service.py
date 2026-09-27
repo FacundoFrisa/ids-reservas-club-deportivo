@@ -44,11 +44,23 @@ def crear_reserva(datos):
     )
 
     if conflicto:
-        if conflicto['id_cancha'] == datos['id_cancha']:
-            raise ConflictError("La cancha ya tiene una reserva confirmada que se superpone con el horario solicitado.")
-        else:
-            raise ConflictError("El socio ya tiene una reserva confirmada en ese horario en otra cancha.")
+        if conflicto.get("es_bloqueo"):
+            raise ConflictError(
+                "La cancha se encuentra inhabilitada por mantenimiento "
+                "en el horario solicitado."
+            )
 
+        elif conflicto["id_cancha"] == datos["id_cancha"]:
+            raise ConflictError(
+                "La cancha ya tiene una reserva confirmada que se "
+                "superpone con el horario solicitado."
+            )
+
+        else:
+            raise ConflictError(
+                "El socio ya tiene una reserva confirmada en ese horario "
+                "en otra cancha."
+            )
     inicio_dt = datetime.strptime(datos['fecha_hora_inicio'][:-6], "%Y-%m-%dT%H:%M:%S.%f")
     fin_dt = datetime.strptime(datos['fecha_hora_fin'][:-6], "%Y-%m-%dT%H:%M:%S.%f")
     horas = int((fin_dt - inicio_dt).total_seconds() / 3600)

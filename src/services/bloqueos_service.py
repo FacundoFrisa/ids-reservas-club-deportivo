@@ -1,12 +1,13 @@
 from src.repositories.bloqueos_repository import BloqueosRepository
+from src.repositories.canchas_repository import CanchasRepository
+from src.errors.exceptions import NotFoundError, ConflictError
 
 def crear_bloqueo(datos):
-    if not datos.get("id_cancha") or not datos.get("fecha") or not datos.get("hora_inicio") or not datos.get("hora_fin"):
-        raise ValueError("Todos los campos obligatorios deben estar completos.")
-    
-    if datos["hora_inicio"] >= datos["hora_fin"]:
-        raise ValueError("La hora de inicio debe ser menor a la hora de fin.")
+    cancha = CanchasRepository.obtener_cancha_por_id(datos["id_cancha"])
 
+    if not cancha:
+        raise NotFoundError("La cancha solicitada no existe.")
+    
     hay_superposicion = BloqueosRepository.existe_superposicion(
         datos["id_cancha"], 
         datos["fecha"], 
@@ -15,7 +16,7 @@ def crear_bloqueo(datos):
     )
     
     if hay_superposicion:
-        raise ValueError("No se puede crear el bloqueo porque ya existe una reserva o un mantenimiento confirmado en ese intervalo de horario para esta cancha.")
+        raise ConflictError("No se puede crear el bloqueo porque ya existe una reserva o un mantenimiento confirmado en ese intervalo de horario para esta cancha.")
 
     nuevo_id = BloqueosRepository.crear_bloqueo(datos)
     datos["id"] = nuevo_id
@@ -25,6 +26,8 @@ def obtener_bloqueos(filtros, limit, offset):
     bloqueos, total = BloqueosRepository.obtener_bloqueos(filtros, limit, offset)
 
     for bloqueo in bloqueos:
+        if "fecha" in bloqueo and bloqueo["fecha"] is not None:
+            bloqueo["fecha"] = str(bloqueo["fecha"])
         if "hora_inicio" in bloqueo and bloqueo["hora_inicio"] is not None:
             bloqueo["hora_inicio"] = str(bloqueo["hora_inicio"])
         if "hora_fin" in bloqueo and bloqueo["hora_fin"] is not None:
@@ -35,5 +38,5 @@ def obtener_bloqueos(filtros, limit, offset):
 def eliminar_bloqueo(bloqueo_id):
     eliminado = BloqueosRepository.eliminar_bloqueo(bloqueo_id)
     if not eliminado:
-        raise LookupError("El bloqueo especificado no existe.")
+        raise NotFoundError(f"El bloqueo con id {bloqueo_id} no existe.")
     return True

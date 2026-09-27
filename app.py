@@ -6,10 +6,8 @@ from src.routes.canchas_routes import canchas_bp
 from src.routes.socios_routes import socios_bp
 from src.routes.reservas_routes import reservas_bp
 from src.routes.bloqueos_routes import bloqueos_bp
-from flask_cors import CORS
 
 app = Flask(__name__)
-CORS(app)
 register_error_handlers(app)
 app.json.ensure_ascii = False
 app.json.sort_keys = False

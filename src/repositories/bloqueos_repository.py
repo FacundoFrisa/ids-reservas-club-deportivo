@@ -90,8 +90,8 @@ class BloqueosRepository:
                 cursor.execute(query_bloqueos, (id_cancha, fecha, hora_fin, hora_inicio))
                 hay_bloqueo = cursor.fetchone() is not None
 
-                fh_inicio_str = f"{fecha} {hora_inicio}"
-                fh_fin_str = f"{fecha} {hora_fin}"
+                fh_inicio_str = f"{fecha}T{hora_inicio}.000000-03:00"
+                fh_fin_str = f"{fecha}T{hora_fin}.000000-03:00"
 
                 query_reservas = """
                     SELECT id FROM reservas 
