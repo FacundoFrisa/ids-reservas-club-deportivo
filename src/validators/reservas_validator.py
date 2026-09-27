@@ -138,3 +138,13 @@ def validar_creacion_reserva(data):
         raise BadRequestError(str(e))
 
     return data
+
+def validar_cambio_estado(data):
+    if not data or 'estado' not in data:
+        raise BadRequestError("El cuerpo debe contener el campo 'estado'.")
+    
+    estado = data['estado']
+    if estado not in ['confirmada', 'cancelada', 'finalizada']:
+        raise BadRequestError("Estado desconocido. Solo se permite 'confirmada', 'cancelada' o 'finalizada'.")
+    
+    return estado

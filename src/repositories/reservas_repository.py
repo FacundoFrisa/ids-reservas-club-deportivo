@@ -1,6 +1,5 @@
 from src.database.connection import get_db_connection
 
-
 class ReservasRepository:
 
     @staticmethod
@@ -107,7 +106,6 @@ class ReservasRepository:
         conexion = get_db_connection()
         try:
             with conexion.cursor() as cursor:
-                # Obtenemos si están activos y el precio vigente de la cancha[cite: 2]
                 cursor.execute("SELECT activa, precio_hora FROM canchas WHERE id = %s", (id_cancha,))
                 cancha = cursor.fetchone()
                 
@@ -153,5 +151,19 @@ class ReservasRepository:
                 ))
                 conexion.commit()
                 return cursor.lastrowid
+        finally:
+            conexion.close()
+            
+    @staticmethod
+    def actualizar_estado(id_reserva, nuevo_estado):
+        from src.database.connection import get_db_connection
+        conexion = get_db_connection()
+        try:
+            with conexion.cursor() as cursor:
+                cursor.execute(
+                    "UPDATE reservas SET estado = %s WHERE id = %s",
+                    (nuevo_estado, id_reserva)
+                )
+                conexion.commit()
         finally:
             conexion.close()

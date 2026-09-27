@@ -1,6 +1,6 @@
 from flask import Blueprint, jsonify, request
-from src.services.reservas_service import obtener_reservas, obtener_reserva_por_id, crear_reserva
-from src.validators.reservas_validator import validar_y_obtener_filtros_reservas, validar_id_reserva, validar_creacion_reserva
+from src.services.reservas_service import obtener_reservas, obtener_reserva_por_id, crear_reserva, cambiar_estado_reserva
+from src.validators.reservas_validator import validar_y_obtener_filtros_reservas, validar_id_reserva, validar_creacion_reserva, validar_cambio_estado
 from src.utils.pagination import get_pagination_params, generate_hateoas_links
 
 reservas_bp = Blueprint("reservas", __name__)
@@ -47,3 +47,12 @@ def post_reserva():
     resultado = crear_reserva(datos_validados)
     
     return jsonify(resultado), 201
+
+@reservas_bp.route("/reservas/<int:id>/estado", methods=["PUT"])
+def put_estado_reserva(id):
+    data = request.get_json(silent=True)
+    
+    nuevo_estado = validar_cambio_estado(data)
+    reserva_actualizada = cambiar_estado_reserva(id, nuevo_estado)
+    
+    return jsonify(reserva_actualizada), 200

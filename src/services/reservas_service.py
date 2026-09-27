@@ -1,6 +1,6 @@
 from src.repositories.reservas_repository import ReservasRepository
 from src.errors.exceptions import NotFoundError, ConflictError
-from datetime import datetime
+from datetime import datetime, timezone, timedelta
 
 def obtener_reservas(filtros, limit, offset):
     reservas, total_records = ReservasRepository.buscar_reservas(
@@ -70,3 +70,35 @@ def crear_reserva(datos):
     nueva_reserva['id'] = reserva_id
     
     return nueva_reserva
+
+def cambiar_estado_reserva(id_reserva, nuevo_estado):
+    reserva = ReservasRepository.obtener_reserva_por_id(id_reserva)
+    if not reserva:
+        raise NotFoundError("La reserva solicitada no existe.")
+
+    estado_actual = reserva['estado']
+
+    if estado_actual == nuevo_estado:
+        return reserva
+
+    if estado_actual in ['cancelada', 'finalizada']:
+        raise ConflictError(f"Transición no permitida. La reserva ya se encuentra {estado_actual}.")
+
+    if estado_actual == 'confirmada':
+        gmt3 = timezone(timedelta(hours=-3))
+        ahora = datetime.now(gmt3).replace(tzinfo=None)
+        
+        inicio_dt = datetime.strptime(reserva['fecha_hora_inicio'][:-6], "%Y-%m-%dT%H:%M:%S.%f")
+        fin_dt = datetime.strptime(reserva['fecha_hora_fin'][:-6], "%Y-%m-%dT%H:%M:%S.%f")
+
+        if nuevo_estado == 'cancelada':
+            if ahora >= inicio_dt:
+                raise ConflictError("No se puede cancelar: el horario de inicio ya llegó o pasó.")
+        elif nuevo_estado == 'finalizada':
+            if ahora < fin_dt:
+                raise ConflictError("No se puede finalizar: aún no se alcanzó el horario de fin.")
+
+    ReservasRepository.actualizar_estado(id_reserva, nuevo_estado)
+    reserva['estado'] = nuevo_estado
+    
+    return reserva
