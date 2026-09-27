@@ -145,6 +145,10 @@ class CanchasRepository:
         conexion = get_db_connection()
         try:
             with conexion.cursor() as cursor:
+                fecha = filtros["fecha_hora_inicio"][:10]
+                hora_inicio = filtros["fecha_hora_inicio"][11:19]
+                hora_fin = filtros["fecha_hora_fin"][11:19]
+                
                 base_where = """
                     WHERE c.activa = 1 
                     AND NOT EXISTS (
@@ -154,12 +158,25 @@ class CanchasRepository:
                         AND r.fecha_hora_inicio < %s 
                         AND r.fecha_hora_fin > %s
                     )
+                    AND NOT EXISTS (
+                        SELECT 1
+                        FROM bloqueos b
+                        WHERE b.id_cancha = c.id
+                        AND b.fecha = %s
+                        AND b.hora_inicio < %s
+                        AND b.hora_fin > %s
+                    )
                 """
                 
                 query_count = f"SELECT COUNT(*) as total FROM canchas c {base_where}"
                 query_data = f"SELECT c.id, c.nombre, c.id_deporte, c.precio_hora, c.techada, c.activa FROM canchas c {base_where}"
                 
-                params = [filtros['fecha_hora_fin'], filtros['fecha_hora_inicio']]
+                params = [
+                    filtros['fecha_hora_fin'], 
+                    filtros['fecha_hora_inicio'],
+                    fecha,
+                    hora_fin,
+                    hora_inicio]
 
                 if 'id_deporte' in filtros:
                     query_count += " AND c.id_deporte = %s"

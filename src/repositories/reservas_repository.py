@@ -117,11 +117,11 @@ class ReservasRepository:
             conexion.close()
 
     @staticmethod
-    def verificar_superposicion(id_cancha, id_socio, inicio, fin):
+    def verificar_superposicion(id_cancha, id_socio, fecha_hora_inicio, fecha_hora_fin):
         conexion = get_db_connection()
         try:
             with conexion.cursor() as cursor:
-                query = """
+                query_reservas = """
                     SELECT id, id_cancha, id_socio
                     FROM reservas
                     WHERE estado = 'confirmada'
@@ -130,8 +130,34 @@ class ReservasRepository:
                       AND fecha_hora_fin > %s
                     LIMIT 1
                 """
-                cursor.execute(query, (id_cancha, id_socio, fin, inicio))
-                return cursor.fetchone()
+                cursor.execute(query_reservas, (id_cancha, id_socio, fecha_hora_fin, fecha_hora_inicio))
+                reserva_conflicto = cursor.fetchone()
+
+                if reserva_conflicto:
+                    return reserva_conflicto
+
+                fecha = fecha_hora_inicio[:10]
+                hora_inicio = fecha_hora_inicio[11:19]
+                hora_fin = fecha_hora_fin[11:19]
+
+                query_bloqueos = """
+                    SELECT id, id_cancha FROM bloqueos
+                    WHERE id_cancha = %s
+                        AND fecha = %s
+                        AND hora_inicio < %s
+                        AND hora_fin > %s
+                """
+                cursor.execute(query_bloqueos, (id_cancha, fecha, hora_fin, hora_inicio))
+                bloqueo_conflicto = cursor.fetchone()
+
+                if bloqueo_conflicto:
+                    return {
+                        'id_cancha': id_cancha,
+                        'es_bloqueo': True
+                    }
+
+                return None
+
         finally:
             conexion.close()
 
