@@ -5,8 +5,11 @@ from src.routes.deportes_routes import deportes_bp
 from src.routes.canchas_routes import canchas_bp
 from src.routes.socios_routes import socios_bp
 from src.routes.reservas_routes import reservas_bp
+from src.routes.bloqueos_routes import bloqueos_bp
+from flask_cors import CORS
 
 app = Flask(__name__)
+CORS(app)
 register_error_handlers(app)
 app.json.ensure_ascii = False
 app.json.sort_keys = False
@@ -15,6 +18,7 @@ app.register_blueprint(deportes_bp)
 app.register_blueprint(canchas_bp)
 app.register_blueprint(socios_bp)
 app.register_blueprint(reservas_bp)
+app.register_blueprint(bloqueos_bp)
 
 @app.route("/health", methods=["GET"])
 def health_check():
