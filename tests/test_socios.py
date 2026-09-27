@@ -14,6 +14,21 @@ def test_post_socio_exito_y_limpieza_email(client):
     assert data["email"] == "socio.pytest@club.com"
     assert data["activo"] is True
 
+def test_post_socio_email_invalido_devuelve_400(client):
+    body = {
+        "nombre": "Socio Email Invalido",
+        "email": "email_sin_formato_valido",
+    }
+
+    response = client.post("/socios", json=body)
+
+    assert response.status_code == 400
+
+    data = response.get_json()
+
+    assert "errors" in data
+    assert len(data["errors"]) > 0
+    assert data["errors"][0]["code"] == "BAD_REQUEST"
 
 def test_post_socio_email_duplicado_devuelve_409(client):
     body = {
@@ -21,10 +36,8 @@ def test_post_socio_email_duplicado_devuelve_409(client):
         "email": "duplicado.pytest@club.com",
     }
 
-    # Primera creación
     client.post("/socios", json=body)
 
-    # Intento con el mismo email
     response = client.post("/socios", json=body)
 
     assert response.status_code == 409
