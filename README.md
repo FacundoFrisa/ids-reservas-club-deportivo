@@ -3,12 +3,10 @@
 Backend desarrollado en Python y Flask para la gestión de canchas, socios, disponibilidades y reservas del Club Deportivo Encuentro.
 
 ## Integrantes
-* **Nombre y Apellido** - Padrón / DNI
-* **Nombre y Apellido** - Padrón / DNI
 * **Facundo Frisa** - 116621 / 47205331
-* **Nombre y Apellido** - Padrón / DNI
-* **Nombre y Apellido** - Padrón / DNI
-* **Nombre y Apellido** - Padrón / DNI
+* **Matías Alejandro Ozores** - 116166 / 47760583
+* **Ivan Ruddy Aracena Choque** - 115221 / 96165428
+* **Nicolás Valenzuela** - 106191 / 40242029
 
 ## Tecnologías y Versiones Utilizadas
 * **Lenguaje:** Python 3.12+
@@ -16,6 +14,7 @@ Backend desarrollado en Python y Flask para la gestión de canchas, socios, disp
 * **Base de Datos:** MySQL 8.0+ (Engine InnoDB, charset `utf8mb4`)
 * **Conector BD:** PyMySQL 1.1+
 * **Gestión de Entorno:** python-dotenv 1.0+
+* **Testing:** pytest 9.1+
 
 ## Configuración del Entorno
 El proyecto utiliza variables de entorno para mantener separada la configuración del código fuente y evitar la exposición de credenciales en el repositorio.
@@ -103,7 +102,7 @@ La API quedará escuchando en `http://localhost:5000` (o el puerto configurado e
 * **GET** `/canchas/disponibles?fecha=2026-10-15&hora_inicio=18:00:00&hora_fin=20:00:00`
 * **Respuesta (`200 OK`):** Devuelve el listado paginado HATEOAS con las canchas activas libres durante todo el intervalo.
 
-### 4. Crear una reserva
+### 4. Crear una reserva (suponiendo la existencia de socio con id 1 y cancha id 2)
 * **POST** `/reservas`
 * **Cuerpo de la solicitud (`application/json`):**
   ```json
