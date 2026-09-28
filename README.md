@@ -98,23 +98,100 @@ La API quedará escuchando en `http://localhost:5000` (o el puerto configurado e
   }
   ```
 
-### 3. Consultar disponibilidad de canchas
-* **GET** `/canchas/disponibles?fecha=2026-10-15&hora_inicio=18:00:00&hora_fin=20:00:00`
-* **Respuesta (`200 OK`):** Devuelve el listado paginado HATEOAS con las canchas activas libres durante todo el intervalo.
+### 3. Registrar un socio
+* **POST** `/socios`
+* **Cuerpo de la solicitud (`application/json`):**
+  ```json
+  {
+    "nombre": "Juan Pérez",
+    "email": "juan.perez@email.com"
+  }
+  ```
+* **Respuesta (`201 Created`):** Crea el primer socio necesario para realizar la reserva (id_socio: 1).
+* **Cuerpo de la respuesta (`application/json`):**
+  ```json
+  {
+    "id": 1, 
+    "nombre": "Juan Pérez", 
+    "email": "juan.perez@email.com", 
+    "activo": true
+  }
+  ```
 
-### 4. Crear una reserva (suponiendo la existencia de socio con id 1 y cancha id 2)
+### 4. Registrar una cancha 
+* **POST** `/canchas`
+* **Cuerpo de la solicitud (`application/json`):**
+  ```json
+  {
+    "nombre": "Cancha 1 - Fútbol 5", 
+    "id_deporte": 1, 
+    "precio_hora": 1500000
+  }
+  ```
+* **Respuesta (`201 Created`):** Crea la primera cancha asociada al deporte Futbol.
+* **Cuerpo de la respuesta (`application/json`):**
+  ```json
+  {
+    "id": 1, 
+    "nombre": "Cancha 1 - Fútbol 5", 
+    "id_deporte": 1, 
+    "precio_hora": 1500000, 
+    "techada": false,
+    "activa": true
+  }
+  ```
+
+### 5. Consultar disponibilidad de canchas
+* **GET** `/canchas/disponibles?fecha=2026-10-15&hora_inicio=18:00:00&hora_fin=20:00:00`
+* **Respuesta (`200 OK`):**
+* **Cuerpo de la respuesta (`application/json`):**
+  ```json
+  {
+  "canchas": [
+    {
+      "id": 1,
+      "nombre": "Cancha 1 - Fútbol 5",
+      "id_deporte": 1,
+      "precio_hora": 1500000,
+      "techada": false,
+      "activa": true
+    }
+  ],
+  "_links": {
+    "_first": {
+      "href": "http://127.0.0.1:5000/canchas/disponibles?_limit=10&_offset=0&fecha=2026-10-15&hora_inicio=18:00:00&hora_fin=20:00:00"
+    },
+    "_last": {
+      "href": "http://127.0.0.1:5000/canchas/disponibles?_limit=10&_offset=0&fecha=2026-10-15&hora_inicio=18:00:00&hora_fin=20:00:00"
+    }
+  }
+  }
+  ```
+### 6. Crear una reserva
 * **POST** `/reservas`
 * **Cuerpo de la solicitud (`application/json`):**
   ```json
   {
-    "id_socio": 1,
-    "id_cancha": 2,
-    "fecha_hora_inicio": "2026-10-15T18:00:00.000000-03:00",
+    "id_socio": 1, 
+    "id_cancha": 1, 
+    "fecha_hora_inicio": "2026-10-15T18:00:00.000000-03:00", 
     "fecha_hora_fin": "2026-10-15T20:00:00.000000-03:00"
   }
   ```
-* **Respuesta (`201 Created`):** Asigna el estado `confirmada`, congela la tarifa vigente por hora y calcula el total en centavos.
-
+* **Respuesta (`201 Created`):**
+* **Cuerpo de la respuesta (`application/json`):**
+  ```json
+  {
+    "id": 1,
+    "id_socio": 1,
+    "id_cancha": 1,
+    "fecha_hora_inicio": "2026-10-15T18:00:00.000000-03:00",
+    "fecha_hora_fin": "2026-10-15T20:00:00.000000-03:00",
+    "estado": "confirmada",
+    "precio_hora": 1500000,
+    "precio_total": 3000000
+  }
+  ```
 ---
 
 ## Supuestos Adoptados y Reglas de Negocio
